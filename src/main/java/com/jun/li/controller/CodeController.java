@@ -25,8 +25,8 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/tagmanager")
-public class DemoController {
-    private static final Logger LOG = LoggerFactory.getLogger(DemoController.class);
+public class CodeController {
+    private static final Logger LOG = LoggerFactory.getLogger(CodeController.class);
 
     @Value("${store.path}")
     private String storePath;
@@ -36,16 +36,8 @@ public class DemoController {
 
 
     @GetMapping("/healthCheck")
-    public Result test02() {
-        LOG.error("---------------------test-------------");
-        int i =0;
-
-        try {
-            int j = 5 / i;
-        } catch (Exception e) {
-            LOG.error("---------------------exp-------------",e);
-        }
-        return ResultGenerator.genSuccessResult();
+    public Result<String> healthCheck() {
+        return ResultGenerator.genSuccessResult("OK");
     }
 
 
