@@ -27,6 +27,8 @@ import java.util.Objects;
 @RequestMapping("/tagmanager")
 public class CodeController {
     private static final Logger LOG = LoggerFactory.getLogger(CodeController.class);
+    public static final String DEFAULT_PAGESIZE = "50";
+    public static final int MAX_PAGESIZE = 10000;
 
     @Value("${store.path}")
     private String storePath;
@@ -42,11 +44,15 @@ public class CodeController {
 
 
     @GetMapping("/getBatchCodes")
-    public Result<CodeRes> getCodes(@RequestParam("lineCode") String machineNo, @RequestParam(value = "timeNo", required = false) String timeNo) {
+    public Result<CodeRes> getCodes(@RequestParam("lineCode") String machineNo, @RequestParam(value = "timeNo", required = false) String timeNo,
+                                    @RequestParam(value = "pageSize", required = false, defaultValue = DEFAULT_PAGESIZE) int pageSize) {
         //1.先从machineNo_meta.txt中读取 如果不存在此文件或者最后一行是读完了的状态
         // 则新挑选一个归属此machineNo的文件继续读
         if (StringUtils.isBlank(machineNo)) {
-            return ResultGenerator.genFailResult("lineCode is empty");
+            return ResultGenerator.genFailResult("lineCode is empty.");
+        }
+        if (pageSize > MAX_PAGESIZE || pageSize <= 0) {
+            return ResultGenerator.genFailResult("pageSize must large than 0 and less than 10000.");
         }
         File readingFile;
         int lineNumber = 0;
@@ -97,7 +103,7 @@ public class CodeController {
         CodeRes res = new CodeRes();
         List<String> result = null;
         try {
-            result = readLines(readingFile, lineNumber, 50);
+            result = readLines(readingFile, lineNumber, pageSize);
 
         } catch (IOException e) {
             LOG.error("IOException", e);
